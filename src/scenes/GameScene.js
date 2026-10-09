@@ -11,6 +11,8 @@ import Effects from '../systems/Effects.js';
 import { audio } from '../systems/AudioManager.js';
 import { platform } from '../systems/PlatformAdapter.js';
 
+const NO_TOUCH = Object.freeze({ left: false, right: false, jump: false, anchor: false });
+
 /**
  * Runs one level. Owns the systems and wires their interactions; the HUD lives in UIScene and
  * listens to the events emitted here:
@@ -32,6 +34,7 @@ export default class GameScene extends Phaser.Scene {
     this.windExposure = 1;
     this.windInfo = { force: 0, exposure: 1 };
     this.inputState = { left: false, right: false, jumpPressed: false, jumpHeld: false, anchor: false };
+    this.prevTouchJump = false;
   }
 
   create() {
@@ -134,18 +137,24 @@ export default class GameScene extends Phaser.Scene {
     }
   }
 
+  /** Merges keyboard and on-screen touch buttons into one input state. */
   readInput() {
     const k = this.keys;
     const i = this.inputState;
-    i.left = k.left.isDown || k.a.isDown;
-    i.right = k.right.isDown || k.d.isDown;
-    i.jumpHeld = k.space.isDown || k.up.isDown || k.w.isDown;
+    const ui = this.scene.get('UIScene');
+    const touch = ui && ui.touch ? ui.touch.state : NO_TOUCH;
+
+    i.left = k.left.isDown || k.a.isDown || touch.left;
+    i.right = k.right.isDown || k.d.isDown || touch.right;
+    i.jumpHeld = k.space.isDown || k.up.isDown || k.w.isDown || touch.jump;
     // Evaluate every JustDown so none of them stays latched into the next frame.
     const space = Phaser.Input.Keyboard.JustDown(k.space);
     const up = Phaser.Input.Keyboard.JustDown(k.up);
     const w = Phaser.Input.Keyboard.JustDown(k.w);
-    i.jumpPressed = space || up || w;
-    i.anchor = k.down.isDown || k.s.isDown;
+    const touchJumpPressed = touch.jump && !this.prevTouchJump;
+    this.prevTouchJump = touch.jump;
+    i.jumpPressed = space || up || w || touchJumpPressed;
+    i.anchor = k.down.isDown || k.s.isDown || touch.anchor;
   }
 
   clearInput() {

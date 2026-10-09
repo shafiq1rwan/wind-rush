@@ -2,7 +2,7 @@
 //
 //  ground          solid street segments ({ x, width }); gaps between them are pits
 //  obstacles       crate stacks; `heights` lists the stack height (in 64px crates) of each column
-//  signs           tutorial signposts
+//  signs           tutorial signposts (`touchText` replaces `text` when touch controls are shown)
 //  scriptedPickups pickups that fly in once the player passes `triggerX`
 //  wind.pattern    looping list of wind steps: state (calm|breeze|strong|extreme), dir (-1 left, 1 right), seconds
 //  debris.types    relative spawn weights for hazard types
@@ -29,9 +29,17 @@ export const LEVELS = [
     ],
 
     signs: [
-      { x: 330, text: 'Reach the SHELTER\nA / D  or  ← / →' },
-      { x: 720, text: 'SPACE to jump\nhold it to jump higher' },
-      { x: 1420, text: 'GUST coming?\nHold S to ANCHOR!' },
+      {
+        x: 330,
+        text: 'Reach the SHELTER\nA / D  or  ← / →',
+        touchText: 'Reach the SHELTER\nuse the ◀ ▶ buttons',
+      },
+      {
+        x: 720,
+        text: 'SPACE to jump\nhold it to jump higher',
+        touchText: 'Tap JUMP to jump\nhold it to jump higher',
+      },
+      { x: 1420, text: 'GUST coming?\nHold S to ANCHOR!', touchText: 'GUST coming?\nHold ANCHOR!' },
       { x: 2450, text: 'Blue umbrella = shield\nGreen kit = +1 heart' },
       { x: 3300, text: 'Hide in front of crates:\nthey block wind & debris' },
     ],

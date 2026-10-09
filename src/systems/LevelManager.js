@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { DEPTH, GAME_WIDTH, FONT_FAMILY } from '../config/gameConfig.js';
 import { WIND } from '../config/balanceConfig.js';
 import { addSkyBackground } from '../utils/graphicsFactory.js';
+import { touchUI } from '../utils/device.js';
 
 const CRATE = 64;
 const GROUND_HEIGHT = 80;
@@ -110,7 +111,7 @@ export default class LevelManager {
     for (const sign of this.data.signs) {
       this.scene.add.image(sign.x, this.groundY, 'sign').setOrigin(0.5, 1).setDepth(DEPTH.signs);
       this.scene.add
-        .text(sign.x, this.groundY - 130 + 41, sign.text, {
+        .text(sign.x, this.groundY - 130 + 41, (touchUI.enabled && sign.touchText) || sign.text, {
           fontFamily: FONT_FAMILY,
           fontSize: '17px',
           fontStyle: 'bold',

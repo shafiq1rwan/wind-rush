@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS } from '../config/gameConfig.js';
 import { createButton, textStyle } from '../utils/uiFactory.js';
+import { touchUI } from '../utils/device.js';
+import { requestMobileFullscreen } from '../systems/MobileDisplay.js';
 
 const MESSAGES = [
   'Gone with the wind!',
@@ -38,9 +40,14 @@ export default class GameOverScene extends Phaser.Scene {
     this.tweens.add({ targets: face, angle: { from: -12, to: 12 }, duration: 500, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     const title = this.add.text(0, -40, 'OOPS!', textStyle(64, CSS.danger, { stroke: CSS.ink, strokeThickness: 10 })).setOrigin(0.5);
     const message = this.add.text(0, 20, Phaser.Utils.Array.GetRandom(MESSAGES), textStyle(26, CSS.white)).setOrigin(0.5);
-    const retry = createButton(this, -140, 120, 'RETRY', () => this.gs.restartLevel());
+    const retry = createButton(this, -140, 120, 'RETRY', () => {
+      requestMobileFullscreen(this);
+      this.gs.restartLevel();
+    });
     const menu = createButton(this, 140, 120, 'MENU', () => this.gs.goToMenu(), { color: 0xdfe7f2, hoverColor: 0xffffff });
-    const hint = this.add.text(0, 182, 'SPACE / ENTER / R to retry', textStyle(16, CSS.muted)).setOrigin(0.5);
+    const hint = this.add
+      .text(0, 182, touchUI.enabled ? 'Tap RETRY to try again' : 'SPACE / ENTER / R to retry', textStyle(16, CSS.muted))
+      .setOrigin(0.5);
     panel.add([bg, face, title, message, retry, menu, hint]);
     panel.setScale(0.7).setAlpha(0);
     this.tweens.add({ targets: panel, scale: 1, alpha: 1, duration: 320, ease: 'Back.easeOut' });

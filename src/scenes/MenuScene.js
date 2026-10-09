@@ -4,6 +4,8 @@ import { addSkyBackground } from '../utils/graphicsFactory.js';
 import { createButton, textStyle } from '../utils/uiFactory.js';
 import { audio } from '../systems/AudioManager.js';
 import WindEffects from '../systems/WindEffects.js';
+import { touchUI } from '../utils/device.js';
+import { requestMobileFullscreen } from '../systems/MobileDisplay.js';
 
 const GROUND_Y = 640;
 // Above the wind streaks (DEPTH.windFx).
@@ -58,30 +60,30 @@ export default class MenuScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setDepth(UI_DEPTH);
 
-    createButton(this, 640, 320, 'PLAY', () => this.startGame(), { width: 280, height: 76, fontSize: 36 }).setDepth(UI_DEPTH);
-    this.soundButton = createButton(this, 640, 412, this.soundLabel(), () => this.toggleSound(), {
-      width: 240,
-      height: 56,
-      fontSize: 22,
-      color: 0xdfe7f2,
-      hoverColor: 0xffffff,
-    }).setDepth(UI_DEPTH);
+    createButton(this, 640, 320, 'PLAY', () => this.onPlayTap(), { width: 280, height: 76, fontSize: 36 }).setDepth(UI_DEPTH);
+    const secondary = { width: 240, height: 56, fontSize: 22, color: 0xdfe7f2, hoverColor: 0xffffff };
+    // Manual fullscreen toggle on touch devices that support it (not iOS Safari on iPhone).
+    const offerFullscreen = touchUI.enabled && this.scale.fullscreen.available;
+    this.soundButton = createButton(this, offerFullscreen ? 510 : 640, 412, this.soundLabel(), () => this.toggleSound(), secondary).setDepth(
+      UI_DEPTH,
+    );
+    if (offerFullscreen) {
+      createButton(this, 770, 412, 'FULLSCREEN', () => this.toggleFullscreen(), secondary).setDepth(UI_DEPTH);
+    }
 
     const panel = this.add.graphics().setDepth(UI_DEPTH);
     panel.fillStyle(0x1d2340, 0.72);
     panel.fillRoundedRect(290, 470, 700, 100, 18);
+    const controls = touchUI.enabled
+      ? '◀ ▶   move        JUMP   jump (hold for higher)\nhold ANCHOR to brace against gusts        II   pause'
+      : 'A / D  or  ← / →   move        SPACE / W   jump        S / ↓   anchor\nESC   pause        R   restart        M   sound';
     this.add
-      .text(
-        640,
-        520,
-        'A / D  or  ← / →   move        SPACE / W   jump        S / ↓   anchor\nESC   pause        R   restart        M   sound',
-        textStyle(20, CSS.white, { align: 'center', lineSpacing: 12 }),
-      )
+      .text(640, 520, controls, textStyle(20, CSS.white, { align: 'center', lineSpacing: 12 }))
       .setOrigin(0.5)
       .setDepth(UI_DEPTH);
 
     const prompt = this.add
-      .text(640, 600, 'Press SPACE to start', textStyle(22, CSS.white, { stroke: CSS.ink, strokeThickness: 5 }))
+      .text(640, 600, touchUI.enabled ? 'Tap PLAY to start' : 'Press SPACE to start', textStyle(22, CSS.white, { stroke: CSS.ink, strokeThickness: 5 }))
       .setOrigin(0.5)
       .setDepth(UI_DEPTH);
     this.tweens.add({ targets: prompt, alpha: 0.35, duration: 700, yoyo: true, repeat: -1 });
@@ -100,6 +102,18 @@ export default class MenuScene extends Phaser.Scene {
     audio.toggleMute();
     this.soundButton.setLabel(this.soundLabel());
     audio.play('click');
+  }
+
+  // Called from a button's pointerup, which browsers accept as the user gesture fullscreen needs.
+  toggleFullscreen() {
+    if (this.scale.isFullscreen) this.scale.stopFullscreen();
+    else this.scale.startFullscreen();
+  }
+
+  onPlayTap() {
+    // On phones, PLAY also goes fullscreen (and locks landscape where the browser allows it).
+    requestMobileFullscreen(this);
+    this.startGame();
   }
 
   startGame(event) {

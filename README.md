@@ -26,6 +26,15 @@ Add `?debug` to the URL to draw the physics hitboxes, for example `http://localh
 | Esc / P | Pause / resume |
 | M | Mute / unmute |
 
+### Mobile and touch
+
+Phones and tablets show on-screen buttons: **◀ ▶** to move (bottom left), **ANCHOR** and **JUMP** (bottom right), and **II** to pause. Multi-touch works, so you can hold a direction and jump or anchor at the same time, and you can slide your thumb between ◀ and ▶ without lifting it. Touch mode turns on automatically for touch devices, or the first time the screen is touched. Add `?touch` to the URL to try it on a desktop with the mouse.
+
+- **Fullscreen and auto-rotate:** tapping PLAY (and RESUME or RETRY) enters fullscreen and asks the browser to lock the screen to landscape. Android Chrome supports this, so the phone rotates by itself.
+- **Portrait fallback:** iPhone Safari has no fullscreen or orientation lock for web pages. When a touch device is held upright there, the game is drawn rotated 90° to fill the screen, so you just turn the phone sideways. Touches are remapped to match.
+- The game pauses itself if you switch apps or turn the phone upright mid-run.
+- On the menu, a FULLSCREEN button toggles fullscreen manually where the browser supports it.
+
 ## How it plays
 
 - **Wind** follows a scripted pattern for each level: Calm → Breeze → Strong → Extreme, blowing left or right. Its speed adds to or subtracts from yours:
@@ -64,10 +73,13 @@ src/
 │   ├── WindEffects.js       streaks, leaves, clouds, swaying trees
 │   ├── Effects.js           particle bursts, rings, floating text
 │   ├── AudioManager.js      Web Audio placeholder sounds and wind ambience, mute
+│   ├── TouchControls.js     on-screen buttons, multi-touch polling
+│   ├── MobileDisplay.js     fullscreen, landscape lock, rotated portrait layout
 │   └── PlatformAdapter.js   no-op lifecycle seam for a future portal SDK (e.g. Poki)
 ├── scenes/                  Boot, Menu, Game, UI (HUD and pause), GameOver, LevelComplete
 └── utils/
     ├── graphicsFactory.js   every texture, drawn with Graphics primitives
+    ├── device.js            decides when to show the touch interface
     └── uiFactory.js         buttons, text styles, time formatting
 ```
 
@@ -107,11 +119,19 @@ These checks were automated in headless Microsoft Edge against the dev server:
   - A bot that dodges and anchors finished 5 of 5 runs in 39–42 s, with 0–1 hits.
   - A bot that only walks right and hops crates took 2–3 hits per run and died in 2 of 5 runs.
 
-**Not yet verified by a human:** feel, readability and audio. Generated audio only plays after the first click or keypress, as browser autoplay rules require.
+- **24 mobile checks passed** on an emulated Pixel 5 (headless Edge, real multi-touch events), with no console errors:
+  - Touch prompt on the menu; tapping PLAY starts the game and enters fullscreen
+  - Each button works: move, jump, anchor; run + jump together; sliding between ◀ and ▶
+  - Touches away from the buttons do nothing
+  - Pause and resume, game over and retry, all by tapping
+  - Portrait: the game is rotated, centered and fills the screen; taps land on the right buttons; turning upright pauses
+  - Back to landscape: normal layout, controls still correct
+
+**Not yet verified by a human or on real devices:** feel, readability, audio, and whether the landscape lock actually engages on a physical Android phone (the emulator can't show this). Generated audio only plays after the first click or keypress, as browser autoplay rules require.
 
 ## Next milestones
 
 - **M2, game feel:** more animation polish, rain during storms, hit-stop, tuning.
 - **M3, content:** Stormy Suburb and Hurricane Highway, more debris types, level select, progression.
 - **M4, polish.**
-- **M5, platform:** touch controls, save progress, Poki SDK.
+- **M5, platform:** save progress, real-device testing, Poki SDK. (Touch controls are done.)

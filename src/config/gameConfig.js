@@ -75,6 +75,21 @@ export const CSS = {
   muted: '#c9d3e6',
 };
 
+// On-screen touch buttons (game coordinates, 1280x720).
+export const TOUCH_CONTROLS = {
+  radius: 70,
+  // A touch counts for the nearest button within radius * this, so thumbs needn't be precise.
+  hitRadiusMultiplier: 1.5,
+  idleAlpha: 0.45,
+  pressedAlpha: 0.85,
+  buttons: [
+    { key: 'left', x: 118, y: 612 },
+    { key: 'right', x: 292, y: 612 },
+    { key: 'anchor', x: 1010, y: 628, label: 'ANCHOR' },
+    { key: 'jump', x: 1168, y: 556, label: 'JUMP' },
+  ],
+};
+
 export const STORAGE_KEYS = {
   muted: 'windrush.muted',
 };

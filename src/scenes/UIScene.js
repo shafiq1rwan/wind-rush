@@ -3,6 +3,9 @@ import { GAME_WIDTH, GAME_HEIGHT, COLORS, CSS } from '../config/gameConfig.js';
 import { WIND } from '../config/balanceConfig.js';
 import { audio } from '../systems/AudioManager.js';
 import { createButton, formatTime, textStyle } from '../utils/uiFactory.js';
+import { touchUI } from '../utils/device.js';
+import TouchControls from '../systems/TouchControls.js';
+import { requestMobileFullscreen } from '../systems/MobileDisplay.js';
 
 const WIND_PANEL = { x: 640, y: 46, width: 330, height: 70 };
 const METER = { x: 560, y: 56, width: 180, height: 14 };
@@ -11,8 +14,9 @@ const toCss = (color) => `#${color.toString(16).padStart(6, '0')}`;
 const STATE_CSS = Object.fromEntries(Object.entries(WIND.states).map(([key, def]) => [key, toCss(def.color)]));
 
 /**
- * In-game HUD, gust warnings and the pause menu. Runs in parallel with GameScene and also owns
- * the global keys (Esc/P pause, R restart, M mute) because a paused scene receives no input.
+ * In-game HUD, gust warnings, touch controls and the pause menu. Runs in parallel with GameScene
+ * and also owns the global keys (Esc/P pause, R restart, M mute) because a paused scene receives
+ * no input.
  */
 export default class UIScene extends Phaser.Scene {
   constructor() {
@@ -30,6 +34,7 @@ export default class UIScene extends Phaser.Scene {
     this.buildGustBanner();
     this.buildHints();
     this.buildPauseMenu();
+    this.buildTouchControls();
 
     this.refreshHearts(this.gs.player.hp, 0);
     this.refreshShield(this.gs.player.shield);
@@ -50,6 +55,10 @@ export default class UIScene extends Phaser.Scene {
     kb.on('keydown-R', this.onRestartKey, this);
     kb.on('keydown-M', this.toggleMute, this);
     this.game.events.on(Phaser.Core.Events.BLUR, this.onBlur, this);
+    // Mobile: switching apps hides the page; turning the phone upright mid-run swaps to the rotated
+    // layout, so give the player a pause to re-grip. (Locking to landscape never triggers this.)
+    this.game.events.on(Phaser.Core.Events.HIDDEN, this.onBlur, this);
+    this.scale.on(Phaser.Scale.Events.ORIENTATION_CHANGE, this.onOrientationChange, this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.onShutdown, this);
   }
 
@@ -137,7 +146,10 @@ export default class UIScene extends Phaser.Scene {
       .text(GAME_WIDTH / 2, 170, 'PAUSED', textStyle(72, CSS.coat, { stroke: CSS.ink, strokeThickness: 10 }))
       .setOrigin(0.5);
     this.pauseButtons = [
-      createButton(this, GAME_WIDTH / 2, 300, 'RESUME', () => this.resume()),
+      createButton(this, GAME_WIDTH / 2, 300, 'RESUME', () => {
+        requestMobileFullscreen(this); // re-enter if the player swiped out of fullscreen
+        this.resume();
+      }),
       createButton(this, GAME_WIDTH / 2, 390, 'RESTART', () => this.gs.restartLevel()),
       createButton(this, GAME_WIDTH / 2, 480, 'MAIN MENU', () => this.gs.goToMenu()),
     ];
@@ -149,18 +161,47 @@ export default class UIScene extends Phaser.Scene {
       hoverColor: 0xffffff,
     });
     this.pauseButtons.push(this.pauseSound);
-    const keys = this.add
+    this.pauseKeysHint = this.add
       .text(GAME_WIDTH / 2, 640, 'ESC resume   R restart   M sound', textStyle(18, CSS.muted))
       .setOrigin(0.5);
-    c.add([dim, title, ...this.pauseButtons, keys]);
+    c.add([dim, title, ...this.pauseButtons, this.pauseKeysHint]);
     c.setVisible(false);
     this.pauseButtons.forEach((b) => b.setEnabled(false));
     this.pauseMenu = c;
   }
 
+  buildTouchControls() {
+    this.touch = new TouchControls(this, touchUI.enabled);
+    this.pauseTouchButton = createButton(this, GAME_WIDTH - 50, 142, 'II', () => this.pause(), {
+      width: 64,
+      height: 56,
+      fontSize: 26,
+      color: 0xdfe7f2,
+      hoverColor: 0xffffff,
+    });
+    // A touch on a device that didn't report a coarse pointer (e.g. touchscreen laptop) turns touch mode on.
+    this.input.on('pointerdown', this.onPointerDown, this);
+    this.applyTouchMode();
+  }
+
+  onPointerDown(pointer) {
+    if (touchUI.noticePointer(pointer)) this.applyTouchMode();
+  }
+
+  applyTouchMode() {
+    const on = touchUI.enabled;
+    this.touch.setVisible(on);
+    this.pauseTouchButton.setVisible(on).setEnabled(on);
+    this.hint.setVisible(!on);
+    this.pauseKeysHint.setVisible(!on);
+    this.muteText.setVisible(!on); // keyboard-only hint; touch players use the pause menu's sound button
+  }
+
   // --- HUD updates --------------------------------------------------------------------------
 
   update() {
+    // Runs before GameScene's update each frame (scenes update top-down), so input is fresh.
+    this.touch.update();
     const gs = this.gs;
     if (!gs || !gs.wind) return;
     const wind = gs.wind;
@@ -223,7 +264,7 @@ export default class UIScene extends Phaser.Scene {
   onGustWarning(info) {
     this.tweens.killTweensOf(this.banner);
     this.bannerTitle.setText('GUST INCOMING!');
-    this.bannerSub.setText('Hold S or ↓ to ANCHOR');
+    this.bannerSub.setText(touchUI.enabled ? 'Hold the ANCHOR button!' : 'Hold S or ↓ to ANCHOR');
     // Arrows show which way the gust will blow.
     this.bannerArrows.forEach((a) => a.setFlipX(info.direction < 0));
     this.banner.setVisible(true).setAlpha(1).setScale(0.6);
@@ -278,6 +319,10 @@ export default class UIScene extends Phaser.Scene {
     if (!this.paused && this.gs.state === 'playing') this.pause();
   }
 
+  onOrientationChange() {
+    if (this.scale.isPortrait) this.onBlur();
+  }
+
   onRestartKey(event) {
     if (event && event.repeat) return;
     this.gs.restartLevel();
@@ -297,6 +342,9 @@ export default class UIScene extends Phaser.Scene {
   onShutdown() {
     this.gameBindings.forEach(([event, fn]) => this.gs.events.off(event, fn, this));
     this.game.events.off(Phaser.Core.Events.BLUR, this.onBlur, this);
+    this.game.events.off(Phaser.Core.Events.HIDDEN, this.onBlur, this);
+    this.scale.off(Phaser.Scale.Events.ORIENTATION_CHANGE, this.onOrientationChange, this);
+    this.input.off('pointerdown', this.onPointerDown, this);
     this.input.keyboard.off('keydown-ESC', this.togglePause, this);
     this.input.keyboard.off('keydown-P', this.togglePause, this);
     this.input.keyboard.off('keydown-R', this.onRestartKey, this);

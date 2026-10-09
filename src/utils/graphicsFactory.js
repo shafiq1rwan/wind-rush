@@ -443,6 +443,27 @@ function createHudTextures(scene) {
     g.fillCircle(18, 13, 1.4);
   });
 
+  // Touch control button background and anchor icon.
+  make(scene, 'touch-button', 144, 144, (g) => {
+    g.fillStyle(COLORS.uiPanel, 0.75);
+    g.fillCircle(72, 72, 70);
+    g.lineStyle(5, 0xffffff, 0.85);
+    g.strokeCircle(72, 72, 67);
+  });
+
+  make(scene, 'icon-anchor', 48, 48, (g) => {
+    g.lineStyle(5, 0xffffff, 1);
+    g.strokeCircle(24, 8, 5);
+    g.lineBetween(24, 13, 24, 44);
+    g.lineBetween(13, 20, 35, 20);
+    g.beginPath();
+    g.arc(24, 28, 17, 0.12 * Math.PI, 0.88 * Math.PI, false);
+    g.strokePath();
+    g.fillStyle(0xffffff, 1);
+    g.fillTriangle(37, 26, 45, 32, 37, 38);
+    g.fillTriangle(11, 26, 3, 32, 11, 38);
+  });
+
   // Off-screen debris indicators: a disc with an icon and an arrow tip pointing right.
   const indicator = (key, color, drawIcon) =>
     make(scene, key, 50, 40, (g) => {

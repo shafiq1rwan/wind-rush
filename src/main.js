@@ -7,6 +7,7 @@ import GameScene from './scenes/GameScene.js';
 import UIScene from './scenes/UIScene.js';
 import GameOverScene from './scenes/GameOverScene.js';
 import LevelCompleteScene from './scenes/LevelCompleteScene.js';
+import { setupMobileDisplay } from './systems/MobileDisplay.js';
 
 const config = {
   type: Phaser.AUTO,
@@ -17,6 +18,8 @@ const config = {
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
+    // Fullscreen the whole page (not just the canvas) so the portrait-rotation CSS keeps applying.
+    fullscreenTarget: document.documentElement,
   },
   physics: {
     default: 'arcade',
@@ -28,11 +31,18 @@ const config = {
   render: {
     antialias: true,
   },
+  input: {
+    // Four touch points (plus the mouse), so players can hold move, jump and anchor together.
+    activePointers: 4,
+  },
+  // Stops long-presses on the touch buttons from opening the browser context menu.
+  disableContextMenu: true,
   // Scene order is also render order: overlays must come after GameScene and UIScene.
   scene: [BootScene, MenuScene, GameScene, UIScene, GameOverScene, LevelCompleteScene],
 };
 
 const game = new Phaser.Game(config);
+setupMobileDisplay(game);
 
 // Handy for debugging from the browser console during development.
 if (import.meta.env.DEV) window.__WIND_RUSH__ = game;
