@@ -18,8 +18,6 @@ const config = {
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
-    // Fullscreen the whole page (not just the canvas) so the portrait-rotation CSS keeps applying.
-    fullscreenTarget: document.documentElement,
   },
   physics: {
     default: 'arcade',

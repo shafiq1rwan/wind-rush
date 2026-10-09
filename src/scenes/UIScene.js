@@ -5,7 +5,6 @@ import { audio } from '../systems/AudioManager.js';
 import { createButton, formatTime, textStyle } from '../utils/uiFactory.js';
 import { touchUI } from '../utils/device.js';
 import TouchControls from '../systems/TouchControls.js';
-import { requestMobileFullscreen } from '../systems/MobileDisplay.js';
 
 const WIND_PANEL = { x: 640, y: 46, width: 330, height: 70 };
 const METER = { x: 560, y: 56, width: 180, height: 14 };
@@ -146,10 +145,7 @@ export default class UIScene extends Phaser.Scene {
       .text(GAME_WIDTH / 2, 170, 'PAUSED', textStyle(72, CSS.coat, { stroke: CSS.ink, strokeThickness: 10 }))
       .setOrigin(0.5);
     this.pauseButtons = [
-      createButton(this, GAME_WIDTH / 2, 300, 'RESUME', () => {
-        requestMobileFullscreen(this); // re-enter if the player swiped out of fullscreen
-        this.resume();
-      }),
+      createButton(this, GAME_WIDTH / 2, 300, 'RESUME', () => this.resume()),
       createButton(this, GAME_WIDTH / 2, 390, 'RESTART', () => this.gs.restartLevel()),
       createButton(this, GAME_WIDTH / 2, 480, 'MAIN MENU', () => this.gs.goToMenu()),
     ];

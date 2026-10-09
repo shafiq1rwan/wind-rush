@@ -1,15 +1,12 @@
 import Phaser from 'phaser';
-import { touchUI } from '../utils/device.js';
 
 /**
- * Landscape-only presentation on phones and tablets.
+ * Landscape-only presentation on phones and tablets ("auto-rotate").
  *
- * 1. Fullscreen + orientation lock: requestMobileFullscreen() (called from PLAY / RESUME / RETRY
- *    taps) enters fullscreen and asks the browser to lock landscape. Android Chrome honours this,
- *    so the screen turns itself.
- * 2. Rotated fallback: where locking isn't available (iPhone Safari, rotation-locked devices), a
- *    touch device held in portrait gets the game drawn rotated 90° (see ROTATED_QUERY in
- *    index.html). The player just turns the phone sideways.
+ * A touch device held in portrait gets the game drawn rotated 90° to fill the screen (see
+ * ROTATED_QUERY in index.html), so the player just turns the phone sideways. Turning the device
+ * to landscape switches back to the normal layout. This needs no fullscreen or orientation lock,
+ * so it works the same on Android and iPhone.
  *
  * CSS rotation confuses Phaser wherever it measures with getBoundingClientRect (which returns the
  * rotated box), so these are adapted here:
@@ -35,33 +32,6 @@ export function setupMobileDisplay(game) {
   if (game.isBooted) remeasure();
   else game.events.once(Phaser.Core.Events.READY, remeasure);
   rotated.addEventListener('change', remeasure);
-
-  game.scale.on(Phaser.Scale.Events.ENTER_FULLSCREEN, lockLandscape);
-  game.scale.on(Phaser.Scale.Events.LEAVE_FULLSCREEN, unlockOrientation);
-}
-
-/** Enter fullscreen on touch devices. Must be called from a pointerup handler (user gesture). */
-export function requestMobileFullscreen(scene) {
-  const scale = scene.scale;
-  if (!touchUI.enabled || !scale.fullscreen.available || scale.isFullscreen) return;
-  scale.startFullscreen();
-}
-
-function lockLandscape() {
-  try {
-    const result = window.screen.orientation?.lock?.('landscape');
-    if (result && result.catch) result.catch(() => {}); // unsupported (e.g. iOS): rotated fallback covers it
-  } catch {
-    // Older browsers throw synchronously; same fallback applies.
-  }
-}
-
-function unlockOrientation() {
-  try {
-    window.screen.orientation?.unlock?.();
-  } catch {
-    // Nothing to undo.
-  }
 }
 
 function patchParentBounds(scale) {

@@ -30,10 +30,9 @@ Add `?debug` to the URL to draw the physics hitboxes, for example `http://localh
 
 Phones and tablets show on-screen buttons: **◀ ▶** to move (bottom left), **ANCHOR** and **JUMP** (bottom right), and **II** to pause. Multi-touch works, so you can hold a direction and jump or anchor at the same time, and you can slide your thumb between ◀ and ▶ without lifting it. Touch mode turns on automatically for touch devices, or the first time the screen is touched. Add `?touch` to the URL to try it on a desktop with the mouse.
 
-- **Fullscreen and auto-rotate:** tapping PLAY (and RESUME or RETRY) enters fullscreen and asks the browser to lock the screen to landscape. Android Chrome supports this, so the phone rotates by itself.
-- **Portrait fallback:** iPhone Safari has no fullscreen or orientation lock for web pages. When a touch device is held upright there, the game is drawn rotated 90° to fill the screen, so you just turn the phone sideways. Touches are remapped to match.
+- **Auto-rotate:** when a touch device is held upright, the game is drawn rotated 90° to fill the screen, so you just turn the phone sideways. Touches are remapped to match. Turning the device to landscape switches to the normal layout. This works the same on Android and iPhone.
+- **No fullscreen:** the game doesn't request fullscreen, because browsers always show an "exit full screen" notice on entry, and it covered the start of a run.
 - The game pauses itself if you switch apps or turn the phone upright mid-run.
-- On the menu, a FULLSCREEN button toggles fullscreen manually where the browser supports it.
 
 ## How it plays
 
@@ -74,7 +73,7 @@ src/
 │   ├── Effects.js           particle bursts, rings, floating text
 │   ├── AudioManager.js      Web Audio placeholder sounds and wind ambience, mute
 │   ├── TouchControls.js     on-screen buttons, multi-touch polling
-│   ├── MobileDisplay.js     fullscreen, landscape lock, rotated portrait layout
+│   ├── MobileDisplay.js     auto-rotate: rotated portrait layout and touch remapping
 │   └── PlatformAdapter.js   no-op lifecycle seam for a future portal SDK (e.g. Poki)
 ├── scenes/                  Boot, Menu, Game, UI (HUD and pause), GameOver, LevelComplete
 └── utils/
@@ -120,14 +119,14 @@ These checks were automated in headless Microsoft Edge against the dev server:
   - A bot that only walks right and hops crates took 2–3 hits per run and died in 2 of 5 runs.
 
 - **24 mobile checks passed** on an emulated Pixel 5 (headless Edge, real multi-touch events), with no console errors:
-  - Touch prompt on the menu; tapping PLAY starts the game and enters fullscreen
+  - Touch prompt on the menu; tapping PLAY starts the game (without going fullscreen)
   - Each button works: move, jump, anchor; run + jump together; sliding between ◀ and ▶
   - Touches away from the buttons do nothing
   - Pause and resume, game over and retry, all by tapping
   - Portrait: the game is rotated, centered and fills the screen; taps land on the right buttons; turning upright pauses
   - Back to landscape: normal layout, controls still correct
 
-**Not yet verified by a human or on real devices:** feel, readability, audio, and whether the landscape lock actually engages on a physical Android phone (the emulator can't show this). Generated audio only plays after the first click or keypress, as browser autoplay rules require.
+**Not yet verified by a human or on real devices:** feel, readability, audio, and how the rotated layout feels on a physical phone. Generated audio only plays after the first click or keypress, as browser autoplay rules require.
 
 ## Next milestones
 
