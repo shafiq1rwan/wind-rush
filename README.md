@@ -91,6 +91,8 @@ All numbers live in [src/config/balanceConfig.js](src/config/balanceConfig.js), 
 - `PLAYER.walkSpeed`
 - `DEBRIS.minHazardGap`
 
+To build a new level, see the [level design guide](docs/LEVEL_DESIGN.md). It has the jump, wind and lane numbers that decide what's possible. Changes are listed in [CHANGELOG.md](CHANGELOG.md).
+
 ### Platform integration
 
 The game reports only three lifecycle hooks, `loadingFinished`, `gameplayStart` and `gameplayStop`, through `src/systems/PlatformAdapter.js`. A Poki adapter should implement those three methods using the official Poki SDK documentation. No SDK calls are guessed in this codebase.
@@ -118,7 +120,7 @@ These checks were automated in headless Microsoft Edge against the dev server:
   - A bot that dodges and anchors finished 5 of 5 runs in 39–42 s, with 0–1 hits.
   - A bot that only walks right and hops crates took 2–3 hits per run and died in 2 of 5 runs.
 
-- **24 mobile checks passed** on an emulated Pixel 5 (headless Edge, real multi-touch events), with no console errors:
+- **25 mobile checks passed** on an emulated Pixel 5 (headless Edge, real multi-touch events), with no console errors:
   - Touch prompt on the menu; tapping PLAY starts the game (without going fullscreen)
   - Each button works: move, jump, anchor; run + jump together; sliding between ◀ and ▶
   - Touches away from the buttons do nothing
