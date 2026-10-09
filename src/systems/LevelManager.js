@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { DEPTH, GAME_WIDTH, FONT_FAMILY } from '../config/gameConfig.js';
+import { DEPTH, GAME_WIDTH, GAME_HEIGHT, FONT_FAMILY } from '../config/gameConfig.js';
 import { WIND } from '../config/balanceConfig.js';
 import { addSkyBackground } from '../utils/graphicsFactory.js';
 import { touchUI } from '../utils/device.js';
@@ -76,12 +76,21 @@ export default class LevelManager {
   buildGround() {
     const scene = this.scene;
     this.groundGroup = scene.physics.add.staticGroup();
+    // The street runs from the surface to the bottom of the screen: sidewalk + far lane on top,
+    // then the near lane and near curb filling the strip where the touch controls sit.
+    const depth = Math.max(GROUND_HEIGHT, GAME_HEIGHT - this.groundY);
     for (const seg of this.data.ground) {
       scene.add
         .tileSprite(seg.x, this.groundY, seg.width, GROUND_HEIGHT, 'ground')
         .setOrigin(0, 0)
         .setDepth(DEPTH.ground);
-      const zone = scene.add.zone(seg.x + seg.width / 2, this.groundY + GROUND_HEIGHT / 2, seg.width, GROUND_HEIGHT);
+      if (depth > GROUND_HEIGHT) {
+        scene.add
+          .tileSprite(seg.x, this.groundY + GROUND_HEIGHT, seg.width, depth - GROUND_HEIGHT, 'road-lower')
+          .setOrigin(0, 0)
+          .setDepth(DEPTH.ground);
+      }
+      const zone = scene.add.zone(seg.x + seg.width / 2, this.groundY + depth / 2, seg.width, depth);
       this.groundGroup.add(zone);
     }
   }

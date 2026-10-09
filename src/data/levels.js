@@ -12,7 +12,8 @@ export const LEVELS = [
     id: 'windy-street',
     name: 'Windy Street',
     width: 6000,
-    groundY: 640,
+    // Keep the street surface at 520: the 200 px below it is reserved for the touch controls.
+    groundY: 520,
     playerStartX: 140,
     parTime: 50,
     decorSeed: 'windy-street',

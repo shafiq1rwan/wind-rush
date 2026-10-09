@@ -4,6 +4,9 @@ All notable changes to Wind Rush. Dates are when the change was committed.
 
 ## Unreleased
 
+### Changed
+- Raised the street from y 640 to y 520. On phones the touch buttons covered the player, crates and low debris; they now sit on a two-lane road below the playing surface. Desktop shows the same deeper street. Gameplay is unchanged.
+
 ### Removed
 - Fullscreen on mobile. The browser's mandatory "exit full screen" notice covered the start of every run. The landscape lock went with it, because browsers only allow it in fullscreen.
 

@@ -559,6 +559,28 @@ function createEnvironmentTextures(scene) {
     g.fillRoundedRect(30, 52, 56, 6, 3);
   });
 
+  // Continues the street below 'ground' (designed for a 120 px strip): near lane, near curb and
+  // the near sidewalk at the bottom edge of the screen.
+  make(scene, 'road-lower', 128, 120, (g) => {
+    g.fillStyle(0x4b5060, 1);
+    g.fillRect(0, 0, 128, 96);
+    g.fillStyle(0x434757, 1);
+    g.fillCircle(40, 20, 2);
+    g.fillCircle(96, 76, 2.5);
+    g.fillCircle(12, 64, 1.5);
+    g.fillStyle(0xf2e8cf, 1);
+    g.fillRoundedRect(94, 38, 56, 6, 3);
+    g.fillRoundedRect(-34, 38, 56, 6, 3);
+    g.fillStyle(0x9a9385, 1);
+    g.fillRect(0, 96, 128, 7);
+    g.fillStyle(0xd8d2c4, 1);
+    g.fillRect(0, 103, 128, 17);
+    g.fillStyle(0xbfb8a8, 1);
+    g.fillRect(0, 103, 128, 2);
+    g.fillRect(0, 105, 2, 15);
+    g.fillRect(64, 105, 2, 15);
+  });
+
   make(scene, 'crate', 64, 64, (g) => {
     g.fillStyle(0x7a4f26, 1);
     g.fillRoundedRect(0, 0, 64, 64, 6);

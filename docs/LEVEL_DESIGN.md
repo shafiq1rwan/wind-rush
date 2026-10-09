@@ -11,7 +11,7 @@ All numbers below come from [src/config/balanceConfig.js](../src/config/balanceC
   id: 'windy-street',          // unique, also the default decoration seed
   name: 'Windy Street',        // shown in the HUD
   width: 6000,                 // level length in px
-  groundY: 640,                // street surface (screen is 720 tall)
+  groundY: 520,                // street surface; keep at 520 (see "Screen layout" below)
   playerStartX: 140,
   parTime: 50,                 // seconds; beating it earns a star
   decorSeed: 'windy-street',   // trees/lamps/clouds are placed from this seed
@@ -34,6 +34,10 @@ All numbers below come from [src/config/balanceConfig.js](../src/config/balanceC
 - `obstacles[].x` is the left edge of the first column. Columns sit side by side, so `{ x: 1900, heights: [1, 2, 1] }` is a 3-column staircase from x 1900 to 2092.
 - Pits: gaps between `ground` segments work in code (falling 160 px below the street kills the player), but no level uses one yet, so playtest carefully the first time.
 - To add the level to the game, append it to `LEVELS`. The level-complete screen shows NEXT LEVEL automatically when a following level exists.
+
+## Screen layout
+
+The screen is 720 px tall. The street surface is at y 520, and the 200 px strip below it (the road) is where the touch buttons sit on phones. Keep `groundY` at 520 so nothing in play (the player, crates, low debris) ever sits under a button. Raising it is fine; lowering it brings back the overlap. The road art below the sidewalk is drawn for exactly this 200 px strip.
 
 ## What the player can do
 

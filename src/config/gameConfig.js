@@ -82,11 +82,13 @@ export const TOUCH_CONTROLS = {
   hitRadiusMultiplier: 1.5,
   idleAlpha: 0.45,
   pressedAlpha: 0.85,
+  // All buttons sit in the street strip below the ground line (levels use groundY 520), so they
+  // never cover the player, crates or low debris.
   buttons: [
-    { key: 'left', x: 118, y: 612 },
-    { key: 'right', x: 292, y: 612 },
-    { key: 'anchor', x: 1010, y: 628, label: 'ANCHOR' },
-    { key: 'jump', x: 1168, y: 556, label: 'JUMP' },
+    { key: 'left', x: 118, y: 628 },
+    { key: 'right', x: 292, y: 628 },
+    { key: 'anchor', x: 1000, y: 640, label: 'ANCHOR' },
+    { key: 'jump', x: 1165, y: 610, label: 'JUMP' },
   ],
 };
 

@@ -29,6 +29,7 @@ There is no test suite or linter in the repo. Verification so far was done with 
 - **All tuning numbers go in `src/config/balanceConfig.js`**; engine/layout constants (depths, colours, touch button layout) go in `src/config/gameConfig.js`. Level layouts go in `src/data/levels.js`. No magic numbers in systems.
 - **Never invent Poki SDK method names.** `src/systems/PlatformAdapter.js` exposes only our own hooks (`loadingFinished`, `gameplayStart`, `gameplayStop`). A real adapter must follow the official Poki docs.
 - **No fullscreen on mobile.** This was the user's decision: the browser's mandatory "exit full screen" notice covered gameplay. Landscape is handled by the rotated portrait layout instead (see below). Don't reintroduce `startFullscreen` or an orientation lock without asking.
+- **Keep levels' `groundY` at 520.** The 200 px below the street is reserved for touch buttons (`TOUCH_CONTROLS` in gameConfig.js). The user found buttons covering the player when the street was at 640.
 - Match the existing style: ES classes, JSDoc on non-obvious gameplay logic, 2-space indent, single quotes.
 
 ## Architecture
