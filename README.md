@@ -132,7 +132,4 @@ These checks were automated in headless Microsoft Edge against the dev server:
 
 ## Next milestones
 
-- **M2, game feel:** more animation polish, rain during storms, hit-stop, tuning.
-- **M3, content:** Stormy Suburb and Hurricane Highway, more debris types, level select, progression.
-- **M4, polish.**
-- **M5, platform:** save progress, real-device testing, Poki SDK. (Touch controls are done.)
+Next up is **M2, game feel**. See [ROADMAP.md](ROADMAP.md) for what's done, what's left in each milestone, decisions to keep, and how to pick the project up on a new machine.

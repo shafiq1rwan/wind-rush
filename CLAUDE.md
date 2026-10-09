@@ -6,7 +6,7 @@ Guidance for Claude Code when working in this repository.
 
 Wind Rush is a 2D side-scrolling arcade survival game built with Phaser 3.90, JavaScript (ES modules) and Vite, using Arcade Physics. It targets browser portals such as Poki. Milestone 1 (core prototype, one level) is done, along with mobile touch support. See README.md for gameplay and controls, and docs/LEVEL_DESIGN.md for level authoring.
 
-The original brief splits the work into 5 milestones. **Build one milestone at a time**; don't pull later-milestone features forward unless asked.
+The original brief splits the work into 5 milestones. **Build one milestone at a time**; don't pull later-milestone features forward unless asked. [ROADMAP.md](ROADMAP.md) tracks what's done and what's next; update it when a milestone item is finished.
 
 ## Commands
 
